@@ -1,7 +1,38 @@
 extends layout
 
-block content 
-    form(action="./users",method="POST")
-        input(name="userName",type="text",class="input")
-        input(name="password",type="text")
-        input(type="submit",value="send")
+block content
+  div.container.mt-5
+    div.card.mx-auto(style="max-width: 500px;")
+      div.card-header.bg-primary.text-white
+        h4.mb-0 Add New User
+      
+      div.card-body
+        form(action="./users", method="POST")
+          div.mb-3
+            label.form-label(for="userName") Username
+            input.form-control(
+              type="text", 
+              id="userName",
+              name="userName", 
+              placeholder="Enter username",
+              required
+            )
+            div.form-text Username must be at least 3 characters long.
+          
+          div.mb-3
+            label.form-label(for="password") Password
+            input.form-control(
+              type="password", 
+              id="password",
+              name="password", 
+              placeholder="Enter password",
+              required
+            )
+            div.form-text Password must be at least 6 characters long.
+          div.form-text if you have email 
+            a(href="users/login").text-success login
+           
+          div.d-grid
+            button.btn.btn-success(type="submit") 
+              i.bi.bi-person-plus.me-2
+              | Create User

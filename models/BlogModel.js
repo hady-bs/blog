@@ -7,8 +7,17 @@ const Blog = sequelize.define("blog", {
     primaryKey: true,
     autoIncrement: true,
   },
-  user: {
+  userName: {
     type: DataTypes.STRING,
+    allowNull: false,
+    references: {
+      model: "Users",
+      key: "userName",
+    },
+  },
+  content: {
+    type: DataTypes.STRING,
+    allowNull: false,
   },
 });
 Blog.sync();

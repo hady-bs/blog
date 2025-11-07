@@ -1,0 +1,42 @@
+extends layout
+
+block content
+  .container.mt-5
+    .row.justify-content-center
+      .col-md-6.col-lg-4
+        .card.shadow
+          .card-header.bg-primary.text-white.text-center
+            h4.mb-0
+              i.bi.bi-person-circle.me-2
+              | Login
+          
+          .card-body.p-4
+            form(action="/users/login", method="POST")
+              .mb-3
+                label.form-label Username
+                input.form-control(
+                  type="text",
+                  name="userName",
+                  placeholder="userName",
+                  required
+                )
+              
+              .mb-3
+                label.form-label Password
+                input.form-control(
+                  type="password",
+                  name="password",
+                  placeholder="password",
+                  required
+                )
+              
+              .mb-3.form-check
+                input.form-check-input(type="checkbox", id="remember")
+                label.form-check-label(for="remember") Remember me
+              
+              .d-grid
+                button.btn.btn-primary(type="submit") Login
+            
+            .text-center.mt-3
+              a(href="/users") Create new account
+
