@@ -9,6 +9,8 @@ var usersRouter = require("./routes/users");
 
 var app = express();
 const sequelize = require("./db");
+const User = require("./models/UsersModel");
+const Blog = require("./models/BlogModel");
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
