@@ -1,5 +1,12 @@
 extends layout
 
 block content
-  h1= title
-  p(class="bg-primary text-white p-4") Welcome to #{title}
+  .container.mt-4
+    h1.display-4.text-center.bg-primary.text-white.p-3.rounded.mb-4 Welcome to my blog
+    
+    .card.text-center
+      .card-body.bg-light
+        h2.card-title.h5.mb-3 to add new blog first
+        .btn-group(role="group")
+          a.btn.btn-success(href="users") Login
+          a.btn.btn-outline-success(href="/users/login") Register
