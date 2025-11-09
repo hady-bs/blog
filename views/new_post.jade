@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .container.mt-5
+    .row.justify-content-center
+      .col-md-8
+        .card
+          .card-header.bg-primary.text-white
+            h4.mb-0 New Blog Post
+          .card-body
+            form(action="/blogs", method="POST")
+              .mb-3
+                label.form-label(for="content") Content
+                textarea.form-control(name="content", id="content", rows="6", required)
+              .d-grid
+                button.btn.btn-success(type="submit") Publish

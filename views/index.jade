@@ -2,11 +2,59 @@ extends layout
 
 block content
   .container.mt-4
-    h1.display-4.text-center.bg-primary.text-white.p-3.rounded.mb-4 Welcome to my blog
+    h1.display-4.text-center.bg-primary.text-white.p-3.rounded.mb-4 Welcome to My Blog
     
-    .card.text-center
-      .card-body.bg-light
-        h2.card-title.h5.mb-3 to add new blog first
-        .btn-group(role="group")
-          a.btn.btn-success(href="users") Login
-          a.btn.btn-outline-success(href="/users/login") Register
+    if user
+      .row.justify-content-center
+        .col-md-8
+          .card.text-center
+            .card-body.bg-light
+              h2.card-title.h5.mb-3 Welcome back! Ready to create a new blog post?
+              a.btn.btn-success(href="/blogs/new")
+                i.bi.bi-plus-circle.me-2
+                | Create Blog
+    else
+      .row.justify-content-center
+        .col-md-8
+          .card.text-center
+            .card-body.bg-light
+              h2.card-title.h5.mb-3 To add new blog posts, please
+              .btn-group(role="group")
+                a.btn.btn-success(href="/users/login")
+                  i.bi.bi-box-arrow-in-right.me-2
+                  | Login
+                a.btn.btn-outline-success(href="/users")
+                  i.bi.bi-person-plus.me-2
+                  | Register
+    
+    //- Recent Posts Section
+    .row.mt-5
+      .col-12
+        h3.text-center.mb-4 Recent Blog Posts
+        .row
+          if blogs && blogs.length
+            each blog in blogs
+              .col-md-4.mb-3
+                .card
+                  .card-body
+                    h5.card-title= blog.author || 'Unknown'
+                    p.card-text= blog.content
+                    small.text-muted Posted on: #{blog.createdAt}
+          else
+            .col-12
+              p.text-center.text-muted No posts available yet.
+
+    //- Features Section (optional)
+    .row.mt-5.bg-light.p-4.rounded
+      .col-md-4.text-center
+        i.bi.bi-pencil-square.display-6.text-primary
+        h4.mt-2 Create Posts
+        p.text-muted Write and share your thoughts with the community
+      .col-md-4.text-center
+        i.bi.bi-chat-dots.display-6.text-primary
+        h4.mt-2 Engage
+        p.text-muted Comment and interact with other bloggers
+      .col-md-4.text-center
+        i.bi.bi-people.display-6.text-primary
+        h4.mt-2 Join Community
+        p.text-muted Become part of our growing blogging community

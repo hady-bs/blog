@@ -7,12 +7,12 @@ const Blog = sequelize.define("blog", {
     primaryKey: true,
     autoIncrement: true,
   },
-  userName: {
-    type: DataTypes.STRING,
+  userId: {
+    type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: "Users",
-      key: "userName",
+      model: "User",
+      key: "id",
     },
   },
   content: {

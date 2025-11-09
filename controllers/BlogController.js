@@ -1,0 +1,148 @@
+const Blog = require("../models/BlogModel");
+const User = require("../models/UsersModel");
+const UserController = require("./UserController");
+const sequelize = require("../db");
+
+class BlogController {
+  // Helper: return array of column names for blogs table
+  static async getBlogColumns() {
+    try {
+      const [results] = await sequelize.query("SHOW COLUMNS FROM blogs");
+      return results.map((r) => r.Field);
+    } catch (error) {
+      console.error("❌ Error fetching blog columns:", error.message);
+      throw error;
+    }
+  }
+
+  // Fetch blogs for rendering: joins Users to include author name
+  static async fetchBlogsForView(limit = null) {
+    try {
+      const cols = await BlogController.getBlogColumns();
+      const hasUserId = cols.includes("userId");
+      const hasUserName = cols.includes("userName");
+
+      console.log("📊 Blog table columns:", cols);
+      console.log("🔗 hasUserId:", hasUserId, "| hasUserName:", hasUserName);
+
+      let sql;
+      if (hasUserId) {
+        sql = `SELECT blog.*, User.userName AS author 
+               FROM blogs AS blog 
+               LEFT JOIN Users AS User ON blog.userId = User.id 
+               ORDER BY blog.id DESC`;
+      } else if (hasUserName) {
+        sql = `SELECT blog.*, User.userName AS author 
+               FROM blogs AS blog 
+               LEFT JOIN Users AS User ON blog.userName = User.userName 
+               ORDER BY blog.id DESC`;
+      } else {
+        // fallback: just select blog rows
+        sql = `SELECT * FROM blogs ORDER BY id DESC`;
+      }
+
+      if (limit) sql += ` LIMIT ${parseInt(limit, 10)}`;
+
+      console.log("📝 Running SQL:", sql);
+
+      // ✅ FIX: Remove destructuring for QueryTypes.SELECT
+      const rows = await sequelize.query(sql, {
+        type: sequelize.QueryTypes.SELECT,
+      });
+
+      console.log("📈 Found blogs:", rows.length, "blogs");
+      console.log("📝 Blog data:", JSON.stringify(rows, null, 2));
+
+      return rows;
+    } catch (error) {
+      console.error("❌ Error in fetchBlogsForView:", error.message);
+      throw error; // Re-throw so the caller can handle it
+    }
+  }
+
+  // List all blogs
+  static async listBlogs(req, res) {
+    try {
+      const blogs = await BlogController.fetchBlogsForView();
+
+      // If request came from a browser expecting HTML, render view; otherwise return JSON
+      if (req.headers["accept"]?.includes("text/html")) {
+        return res.render("index", { blogs: blogs, user: req.user });
+      }
+      return res.json({ success: true, blogs });
+    } catch (error) {
+      console.error("❌ Error fetching blogs:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch blogs",
+        error: error.message,
+      });
+    }
+  }
+
+  // Create a new blog post -- requires token
+  static async createBlog(req, res) {
+    // verifyToken middleware should have set req.user when token is valid
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Access denied. No token provided.",
+      });
+    }
+
+    const { content } = req.body;
+    if (!content?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: "Content is required",
+      });
+    }
+
+    try {
+      const cols = await BlogController.getBlogColumns();
+      const hasUserId = cols.includes("userId");
+      const hasUserName = cols.includes("userName");
+
+      console.log("📝 Creating blog with user:", req.user);
+      console.log("🔗 hasUserId:", hasUserId, "| hasUserName:", hasUserName);
+
+      if (hasUserId) {
+        await sequelize.query(
+          "INSERT INTO blogs (userId, content) VALUES (?, ?)",
+          {
+            replacements: [req.user.userId ?? req.user.id ?? null, content],
+          }
+        );
+      } else if (hasUserName) {
+        await sequelize.query(
+          "INSERT INTO blogs (userName, content) VALUES (?, ?)",
+          {
+            replacements: [req.user.userName || null, content],
+          }
+        );
+      } else {
+        // fallback: try inserting content only
+        await sequelize.query("INSERT INTO blogs (content) VALUES (?)", {
+          replacements: [content],
+        });
+      }
+
+      // For API requests, return JSON
+      if (req.headers["content-type"]?.includes("application/json")) {
+        const rows = await BlogController.fetchBlogsForView(1);
+        return res.status(201).json({ success: true, blog: rows[0] || null });
+      }
+      // otherwise assume form post
+      return res.redirect("/");
+    } catch (error) {
+      console.error("❌ Error creating blog:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to create blog",
+        error: error.message,
+      });
+    }
+  }
+}
+
+module.exports = BlogController;

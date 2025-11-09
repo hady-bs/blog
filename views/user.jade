@@ -36,3 +36,16 @@ block content
             button.btn.btn-success(type="submit") 
               i.bi.bi-person-plus.me-2
               | Create User
+    
+    //- Show blogs (if any)
+    if blogs && blogs.length
+      .row.mt-4
+        .col-12
+          h5.text-center.mb-3 Recent Posts
+        each blog in blogs
+          .col-md-4.mb-3
+            .card
+              .card-body
+                h6.card-title= blog.author || 'Unknown'
+                p.card-text= blog.content
+                small.text-muted Posted on: #{blog.createdAt}

@@ -125,6 +125,13 @@ class UserController {
       req.headers.authorization?.split(" ")[1] || req.cookies?.token;
 
     if (!token) {
+      // If the client expects HTML, redirect to login page
+      if (
+        req.headers["accept"] &&
+        req.headers["accept"].includes("text/html")
+      ) {
+        return res.redirect("/users/login");
+      }
       return res.status(401).json({
         message: "Access denied. No token provided.",
       });
@@ -135,21 +142,53 @@ class UserController {
       req.user = decoded;
       next();
     } catch (error) {
+      // If the client expects HTML, redirect to login page
+      if (
+        req.headers["accept"] &&
+        req.headers["accept"].includes("text/html")
+      ) {
+        return res.redirect("/users/login");
+      }
       return res.status(400).json({
         message: "Invalid token.",
       });
     }
   }
 
+  // Optional middleware: if token present, verify and set req.user; otherwise continue
+  static optionalVerifyToken(req, res, next) {
+    const token =
+      req.headers.authorization?.split(" ")[1] || req.cookies?.token;
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      req.user = decoded;
+    } catch (error) {
+      // If token invalid, don't block — just treat as anonymous
+      req.user = null;
+    }
+    return next();
+  }
+
   // Logout method
   static logout(req, res) {
-    // For API, just return success (client will remove token from localStorage)
-    // For server-side, clear cookie
+    // Clear cookie
     res.clearCookie("token");
-    return res.json({
-      success: true,
-      message: "Logged out successfully",
-    });
+
+    // For API requests, return JSON
+    if (req.headers["content-type"] === "application/json") {
+      return res.json({
+        success: true,
+        message: "Logged out successfully",
+      });
+    }
+
+    // For web requests, redirect to home
+    return res.redirect("/");
   }
 }
 
