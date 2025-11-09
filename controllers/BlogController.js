@@ -7,8 +7,10 @@ class BlogController {
   // Helper: return array of column names for blogs table
   static async getBlogColumns() {
     try {
-      const [results] = await sequelize.query("SHOW COLUMNS FROM blogs");
-      return results.map((r) => r.Field);
+      const [results] = await sequelize.query(
+        "SELECT column_name FROM information_schema.columns WHERE table_name = 'blogs' AND table_schema = 'public'"
+      );
+      return results.map((r) => r.column_name);
     } catch (error) {
       console.error("❌ Error fetching blog columns:", error.message);
       throw error;
