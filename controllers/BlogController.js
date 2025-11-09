@@ -17,40 +17,22 @@ class BlogController {
     }
   }
 
-  // Fetch blogs for rendering: joins Users to include author name
+  // Fetch blogs for rendering: includes User to populate user field
   static async fetchBlogsForView(limit = null) {
     try {
-      const cols = await BlogController.getBlogColumns();
-      const hasUserId = cols.includes("userId");
-      const hasUserName = cols.includes("userName");
-
-      console.log("📊 Blog table columns:", cols);
-      console.log("🔗 hasUserId:", hasUserId, "| hasUserName:", hasUserName);
-
-      let sql;
-      if (hasUserId) {
-        sql = `SELECT blog.*, User.userName AS author 
-               FROM blogs AS blog 
-               LEFT JOIN Users AS User ON blog.userId = User.id 
-               ORDER BY blog.id DESC`;
-      } else if (hasUserName) {
-        sql = `SELECT blog.*, User.userName AS author 
-               FROM blogs AS blog 
-               LEFT JOIN Users AS User ON blog.userName = User.userName 
-               ORDER BY blog.id DESC`;
-      } else {
-        // fallback: just select blog rows
-        sql = `SELECT * FROM blogs ORDER BY id DESC`;
-      }
-
-      if (limit) sql += ` LIMIT ${parseInt(limit, 10)}`;
-
-      console.log("📝 Running SQL:", sql);
-
-      // ✅ FIX: Remove destructuring for QueryTypes.SELECT
-      const rows = await sequelize.query(sql, {
-        type: sequelize.QueryTypes.SELECT,
+      const blogs = await Blog.findAll({
+        include: [
+          {
+            model: User,
+            as: "User", // matches the association
+            attributes: ["id", "userName"], // exclude password for security
+          },
+        ],
+        order: [["id", "DESC"]],
+        limit: limit ? parseInt(limit, 10) : undefined,
       });
+
+      const rows = blogs.map((blog) => blog.toJSON());
 
       console.log("📈 Found blogs:", rows.length, "blogs");
       console.log("📝 Blog data:", JSON.stringify(rows, null, 2));

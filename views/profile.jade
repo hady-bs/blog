@@ -3,32 +3,127 @@ extends layout
 block content
   .container.mt-5
     .row.justify-content-center
-      .col-md-8.col-lg-6
-        .card.shadow
-          .card-header.bg-primary.text-white.text-center
-            h4.mb-0
-              i.bi.bi-person-circle.me-2
-              | Profile
+      .col-md-10.col-lg-8
+        .card.border-0.shadow-lg
+          .card-header.bg-gradient-primary.text-white.text-center.border-0
+            span.material-icons.display-4.mb-2 account_circle
+            h4.mb-0 Profile
 
-          .card-body.p-4
-            .text-center.mb-4
-              i.bi.bi-person-circle.fs-1.text-secondary
-              h5.mt-2= user.userName
+          .card-body.p-5
+            .text-center.mb-5
+              .avatar-circle.mx-auto.mb-3
+                span.material-icons.display-1.text-primary person
+              h5.display-6.fw-bold= user.userName
+              p.text-muted Member since #{new Date().toLocaleDateString()}
 
-            .row
-              .col-sm-6
-                strong Username:
-              .col-sm-6= user.userName
+            .row.g-4
+              .col-md-6
+                .info-card
+                  span.material-icons.me-2.text-primary badge
+                  strong Username:
+                  br
+                  span.fw-semibold= user.userName
 
-            .row.mt-3
-              .col-sm-6
-                strong User ID:
-              .col-sm-6= user.userId
+              .col-md-6
+                .info-card
+                  span.material-icons.me-2.text-primary tag
+                  strong User ID:
+                  br
+                  span.fw-semibold= user.userId
 
-            .text-center.mt-4
-              a.btn.btn-primary(href='/blogs/new')
-                i.bi.bi-plus-circle.me-2
-                | Create Blog
-              a.btn.btn-secondary.ms-2(href='/')
-                i.bi.bi-house.me-2
-                | Back to Home
+            .text-center.mt-5
+              .d-flex.justify-content-center.gap-3
+                a.btn.btn-success.btn-lg(href='/blogs/new')
+                  span.material-icons.me-2 add_circle
+                  | Create Blog
+                a.btn.btn-outline-primary.btn-lg(href='/')
+                  span.material-icons.me-2 home
+                  | Back to Home
+
+  style.
+    .bg-gradient-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    .avatar-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .info-card {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid #667eea;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .info-card:hover {
+      transform: translateY(-2px);
+      transition: transform 0.3s ease;
+    }
+
+    /* Responsive styles for profile page */
+    @media (max-width: 768px) {
+      .card-body {
+        padding: 2rem 1.5rem;
+      }
+      .avatar-circle {
+        width: 100px;
+        height: 100px;
+      }
+      .avatar-circle .material-icons {
+        font-size: 2.5rem;
+      }
+      .display-6 {
+        font-size: 1.8rem;
+      }
+      .info-card {
+        padding: 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .d-flex.justify-content-center.gap-3 {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .d-flex.justify-content-center.gap-3 .btn {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+      .card-header {
+        padding: 1.5rem;
+      }
+      .card-header .display-4 {
+        font-size: 2.5rem;
+      }
+      .card-body {
+        padding: 1.5rem 1rem;
+      }
+      .avatar-circle {
+        width: 80px;
+        height: 80px;
+      }
+      .avatar-circle .material-icons {
+        font-size: 2rem;
+      }
+      .display-6 {
+        font-size: 1.5rem;
+      }
+      .info-card {
+        padding: 1rem;
+        text-align: center;
+      }
+      .info-card strong {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    }
