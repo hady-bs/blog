@@ -86,7 +86,7 @@ class BlogController {
       // Use Sequelize model to create blog instead of raw SQL
       const blogData = {
         content: content,
-        userid: req.user.id ?? null,
+        userid: req.user.userId ?? req.user.id ?? null,
       };
 
       const newBlog = await Blog.create(blogData);
