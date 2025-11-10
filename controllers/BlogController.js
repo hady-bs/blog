@@ -91,16 +91,19 @@ class BlogController {
 
       if (hasUserId) {
         await sequelize.query(
-          "INSERT INTO blogs (userid, content) VALUES (?, ?)",
+          "INSERT INTO blogs (userid, content, createdAt, updatedAt) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
           {
             replacements: [req.user.id ?? null, content],
           }
         );
       } else {
         // fallback: try inserting content only
-        await sequelize.query("INSERT INTO blogs (content) VALUES (?)", {
-          replacements: [content],
-        });
+        await sequelize.query(
+          "INSERT INTO blogs (content, createdAt, updatedAt) VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
+          {
+            replacements: [content],
+          }
+        );
       }
 
       // For API requests, return JSON
