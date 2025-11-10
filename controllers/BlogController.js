@@ -83,28 +83,15 @@ class BlogController {
     }
 
     try {
-      const cols = await BlogController.getBlogColumns();
-      const hasUserId = cols.includes("userid");
+      // Use Sequelize model to create blog instead of raw SQL
+      const blogData = {
+        content: content,
+        userid: req.user.id ?? null,
+      };
 
-      console.log("📝 Creating blog with user:", req.user);
-      console.log("🔗 hasUserId:", hasUserId);
+      const newBlog = await Blog.create(blogData);
 
-      if (hasUserId) {
-        await sequelize.query(
-          "INSERT INTO blogs (userid, content, createdAt, updatedAt) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
-          {
-            replacements: [req.user.id ?? null, content],
-          }
-        );
-      } else {
-        // fallback: try inserting content only
-        await sequelize.query(
-          "INSERT INTO blogs (content, createdAt, updatedAt) VALUES (?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
-          {
-            replacements: [content],
-          }
-        );
-      }
+      console.log("📝 Created blog:", newBlog.id);
 
       // For API requests, return JSON
       if (req.headers["content-type"]?.includes("application/json")) {
