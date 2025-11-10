@@ -17,12 +17,14 @@ const Blog = require("./models/BlogModel");
 // Run migrations on startup
 (async () => {
   try {
+    console.log("Running migrations...");
     await require("./scripts/migrate_blogs_add_columns")();
     await require("./scripts/migrate_blogs_timestamps")();
     console.log("All migrations completed successfully");
   } catch (error) {
     console.error("Migration failed:", error.message);
-    process.exit(1);
+    // Don't exit process, just log the error and continue
+    console.log("Continuing without migrations...");
   }
 })();
 

@@ -6,6 +6,8 @@ const runMigration = async () => {
     const [cols] = await db.query("SHOW COLUMNS FROM blogs");
     const fields = cols.map((c) => c.Field);
 
+    console.log("Existing columns:", fields);
+
     if (!fields.includes("createdAt")) {
       console.log("Adding createdAt column...");
       await db.query(
