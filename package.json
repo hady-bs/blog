@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node --watch ./bin/www"
+    "start": "node --watch ./bin/www",
+    "migrate": "node scripts/migrate_blogs_add_columns.js && node scripts/migrate_blogs_timestamps.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

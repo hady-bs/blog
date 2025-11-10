@@ -13,6 +13,11 @@ var app = express();
 const sequelize = require("./db");
 const User = require("./models/UsersModel");
 const Blog = require("./models/BlogModel");
+
+// Run migrations on startup
+require("./scripts/migrate_blogs_add_columns");
+require("./scripts/migrate_blogs_timestamps");
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
