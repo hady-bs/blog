@@ -30,5 +30,5 @@ const Blog = sequelize.define("blog", {
     defaultValue: DataTypes.NOW,
   },
 });
-Blog.sync();
+
 module.exports = Blog;

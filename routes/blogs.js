@@ -6,6 +6,9 @@ const userController = require("../controllers/UserController");
 // List blogs
 router.get("/", blogController.listBlogs);
 
+// List blogs with pagination
+router.get("/all", blogController.listBlogsPaginated);
+
 // Show new blog form (protected)
 router.get("/new", userController.verifyToken, function (req, res) {
   res.render("new_post", { user: req.user });

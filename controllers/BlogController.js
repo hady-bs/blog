@@ -64,6 +64,67 @@ class BlogController {
     }
   }
 
+  // List blogs with pagination
+  static async listBlogsPaginated(req, res) {
+    try {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await Blog.findAndCountAll({
+        include: [
+          {
+            model: User,
+            as: "User",
+            attributes: ["id", "userName"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: limit,
+        offset: offset,
+      });
+
+      const totalPages = Math.ceil(count / limit);
+
+      const blogs = rows.map((blog) => blog.toJSON());
+
+      // If request came from a browser expecting HTML, render view; otherwise return JSON
+      if (req.headers["accept"]?.includes("text/html")) {
+        return res.render("blogs", {
+          blogs: blogs,
+          user: req.user,
+          currentPage: page,
+          totalPages: totalPages,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+          nextPage: page + 1,
+          prevPage: page - 1,
+          totalBlogs: count,
+        });
+      }
+      return res.json({
+        success: true,
+        blogs,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalBlogs: count,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+          nextPage: page + 1,
+          prevPage: page - 1,
+        },
+      });
+    } catch (error) {
+      console.error("❌ Error fetching blogs with pagination:", error.message);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch blogs",
+        error: error.message,
+      });
+    }
+  }
+
   // Create a new blog post -- requires token
   static async createBlog(req, res) {
     // verifyToken middleware should have set req.user when token is valid
@@ -88,6 +149,8 @@ class BlogController {
         content: content,
         userid: req.user.userId ?? req.user.id ?? null,
       };
+
+      console.log("📝 Creating blog with data:", blogData);
 
       const newBlog = await Blog.create(blogData);
 

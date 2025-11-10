@@ -3,12 +3,10 @@ const db = require("../db");
 const runMigration = async () => {
   try {
     console.log("Checking and adding timestamps to blogs table...");
-    const [cols] = await db.query(
-      "SELECT column_name FROM information_schema.columns WHERE table_name = 'blogs' AND table_schema = 'public'"
-    );
-    const fields = cols.map((c) => c.column_name);
+    const [cols] = await db.query("SHOW COLUMNS FROM blogs");
+    const fields = cols.map((c) => c.Field);
 
-    if (!fields.includes("createdat")) {
+    if (!fields.includes("createdAt")) {
       console.log("Adding createdAt column...");
       await db.query(
         "ALTER TABLE blogs ADD COLUMN createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
@@ -18,10 +16,10 @@ const runMigration = async () => {
       console.log("createdAt column already exists");
     }
 
-    if (!fields.includes("updatedat")) {
+    if (!fields.includes("updatedAt")) {
       console.log("Adding updatedAt column...");
       await db.query(
-        "ALTER TABLE blogs ADD COLUMN updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
+        "ALTER TABLE blogs ADD COLUMN updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"
       );
       console.log("Added updatedAt column");
     } else {

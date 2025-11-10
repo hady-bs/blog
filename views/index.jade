@@ -54,6 +54,11 @@ block content
                     small.text-muted.d-block.mt-3
                       span.material-icons.me-1 schedule
                       | #{blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : 'Recently'}
+            .col-12.mt-3
+              .text-center
+                a.btn.btn-outline-primary(href="/blogs/all")
+                  span.material-icons.me-2 list
+                  | View All Posts
           else
             .col-12
               .card.border-0.bg-light

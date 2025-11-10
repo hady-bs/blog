@@ -1,0 +1,94 @@
+extends layout
+
+block content
+  .container.mt-5
+    .row.mb-4
+      .col-12
+        .d-flex.justify-content-between.align-items-center
+          h2.mb-0
+            span.material-icons.me-2 article
+            | All Blog Posts
+          if user
+            a.btn.btn-primary(href="/blogs/new")
+              span.material-icons.me-2 add
+              | New Post
+
+    .row.mb-4
+      .col-12
+        .card
+          .card-body
+            p.text-muted.mb-0 Showing #{blogs.length} of #{totalBlogs} posts
+
+    .row
+      each blog in blogs
+        .col-lg-6.mb-4
+          .card.h-100.shadow-sm
+            .card-body.d-flex.flex-column
+              .d-flex.align-items-center.mb-3
+                span.material-icons.me-2.text-primary account_circle
+                h6.card-title.mb-0= blog.User ? blog.User.userName : 'Anonymous'
+              p.card-text.flex-grow-1= blog.content.length > 200 ? blog.content.substring(0, 200) + '...' : blog.content
+              .mt-auto
+                small.text-muted.d-block
+                  span.material-icons.me-1 schedule
+                  | #{blog.createdAt ? new Date(blog.createdAt).toLocaleDateString() : 'Recently'}
+
+    // Pagination
+    if totalPages > 1
+      .row.mt-5
+        .col-12
+          nav(aria-label="Blog pagination")
+            ul.pagination.justify-content-center
+              if hasPrevPage
+                li.page-item
+                  a.page-link(href=`/blogs/all?page=${prevPage}` aria-label="Previous")
+                    span(aria-hidden="true") &laquo;
+              else
+                li.page-item.disabled
+                  span.page-link &laquo;
+
+              - var startPage = Math.max(1, currentPage - 2)
+              - var endPage = Math.min(totalPages, currentPage + 2)
+
+              if startPage > 1
+                li.page-item
+                  a.page-link(href="/blogs/all?page=1") 1
+                if startPage > 2
+                  li.page-item.disabled
+                    span.page-link ...
+
+              - for (var i = startPage; i <= endPage; i++)
+                if i === currentPage
+                  li.page-item.active
+                    span.page-link= i
+                else
+                  li.page-item
+                    a.page-link(href=`/blogs/all?page=${i}`)= i
+
+              if endPage < totalPages
+                if endPage < totalPages - 1
+                  li.page-item.disabled
+                    span.page-link ...
+                li.page-item
+                  a.page-link(href=`/blogs/all?page=${totalPages}`)= totalPages
+
+              if hasNextPage
+                li.page-item
+                  a.page-link(href=`/blogs/all?page=${nextPage}` aria-label="Next")
+                    span(aria-hidden="true") &raquo;
+              else
+                li.page-item.disabled
+                  span.page-link &raquo;
+
+  style.
+    .card:hover {
+      transform: translateY(-2px);
+      transition: transform 0.2s ease;
+    }
+    .pagination .page-link {
+      color: #007bff;
+    }
+    .pagination .page-item.active .page-link {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
