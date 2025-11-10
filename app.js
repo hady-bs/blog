@@ -15,8 +15,16 @@ const User = require("./models/UsersModel");
 const Blog = require("./models/BlogModel");
 
 // Run migrations on startup
-require("./scripts/migrate_blogs_add_columns");
-require("./scripts/migrate_blogs_timestamps");
+(async () => {
+  try {
+    await require("./scripts/migrate_blogs_add_columns")();
+    await require("./scripts/migrate_blogs_timestamps")();
+    console.log("All migrations completed successfully");
+  } catch (error) {
+    console.error("Migration failed:", error.message);
+    process.exit(1);
+  }
+})();
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));

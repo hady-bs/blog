@@ -1,6 +1,6 @@
 const db = require("../db");
 
-(async () => {
+const runMigration = async () => {
   try {
     const [cols] = await db.query(
       "SELECT column_name FROM information_schema.columns WHERE table_name = 'blogs' AND table_schema = 'public'"
@@ -20,9 +20,17 @@ const db = require("../db");
     } else {
       console.log("userid column already exists");
     }
-    process.exit(0);
   } catch (e) {
     console.error("ERROR", e && e.message ? e.message : e);
-    process.exit(1);
+    throw e;
   }
-})();
+};
+
+module.exports = runMigration;
+
+// Run if called directly
+if (require.main === module) {
+  runMigration()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
+}

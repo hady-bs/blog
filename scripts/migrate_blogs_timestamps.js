@@ -1,6 +1,6 @@
 const db = require("../db");
 
-(async () => {
+const runMigration = async () => {
   try {
     console.log("Checking and adding timestamps to blogs table...");
     const [cols] = await db.query(
@@ -29,9 +29,17 @@ const db = require("../db");
     }
 
     console.log("Timestamps migration completed");
-    process.exit(0);
   } catch (e) {
     console.error("ERROR", e && e.message ? e.message : e);
-    process.exit(1);
+    throw e;
   }
-})();
+};
+
+module.exports = runMigration;
+
+// Run if called directly
+if (require.main === module) {
+  runMigration()
+    .then(() => process.exit(0))
+    .catch(() => process.exit(1));
+}
