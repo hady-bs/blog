@@ -28,7 +28,7 @@ class BlogController {
             attributes: ["id", "userName"], // exclude password for security
           },
         ],
-        order: [["id", "DESC"]],
+        order: [["createdAt", "DESC"]],
         limit: limit ? parseInt(limit, 10) : undefined,
       });
 
@@ -84,24 +84,16 @@ class BlogController {
 
     try {
       const cols = await BlogController.getBlogColumns();
-      const hasUserId = cols.includes("userId");
-      const hasUserName = cols.includes("userName");
+      const hasUserId = cols.includes("userid");
 
       console.log("📝 Creating blog with user:", req.user);
-      console.log("🔗 hasUserId:", hasUserId, "| hasUserName:", hasUserName);
+      console.log("🔗 hasUserId:", hasUserId);
 
       if (hasUserId) {
         await sequelize.query(
-          "INSERT INTO blogs (userId, content) VALUES (?, ?)",
+          "INSERT INTO blogs (userid, content) VALUES (?, ?)",
           {
-            replacements: [req.user.userId ?? req.user.id ?? null, content],
-          }
-        );
-      } else if (hasUserName) {
-        await sequelize.query(
-          "INSERT INTO blogs (userName, content) VALUES (?, ?)",
-          {
-            replacements: [req.user.userName || null, content],
+            replacements: [req.user.id ?? null, content],
           }
         );
       } else {

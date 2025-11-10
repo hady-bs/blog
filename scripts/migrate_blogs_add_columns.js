@@ -2,8 +2,10 @@ const db = require("../db");
 
 (async () => {
   try {
-    const [cols] = await db.query("SHOW COLUMNS FROM blogs");
-    const fields = cols.map((c) => c.Field);
+    const [cols] = await db.query(
+      "SELECT column_name FROM information_schema.columns WHERE table_name = 'blogs' AND table_schema = 'public'"
+    );
+    const fields = cols.map((c) => c.column_name);
     if (!fields.includes("content")) {
       console.log("Adding content column to blogs...");
       await db.query("ALTER TABLE blogs ADD COLUMN content TEXT");
@@ -11,12 +13,12 @@ const db = require("../db");
     } else {
       console.log("content column already exists");
     }
-    if (!fields.includes("userId")) {
-      console.log("Adding userId column to blogs...");
-      await db.query("ALTER TABLE blogs ADD COLUMN userId INT NULL");
-      console.log("Added userId column");
+    if (!fields.includes("userid")) {
+      console.log("Adding userid column to blogs...");
+      await db.query("ALTER TABLE blogs ADD COLUMN userid INTEGER");
+      console.log("Added userid column");
     } else {
-      console.log("userId column already exists");
+      console.log("userid column already exists");
     }
     process.exit(0);
   } catch (e) {

@@ -7,17 +7,27 @@ const Blog = sequelize.define("blog", {
     primaryKey: true,
     autoIncrement: true,
   },
-  userId: {
+  userid: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: "User",
       key: "id",
     },
   },
   content: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: false,
+  },
+  createdAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
+  },
+  updatedAt: {
+    type: DataTypes.DATE,
+    allowNull: false,
+    defaultValue: DataTypes.NOW,
   },
 });
 Blog.sync();

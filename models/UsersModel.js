@@ -17,8 +17,8 @@ const User = sequelize.define("User", {
     allowNull: false,
   },
 });
-// Associate Blog and User using `userId` as the foreign key on Blog
-User.hasMany(BlogModel, { foreignKey: "userId", sourceKey: "id" });
-BlogModel.belongsTo(User, { foreignKey: "userId", targetKey: "id" });
+// Associate Blog and User using `userid` as the foreign key on Blog
+User.hasMany(BlogModel, { foreignKey: "userid", sourceKey: "id" });
+BlogModel.belongsTo(User, { foreignKey: "userid", targetKey: "id" });
 User.sync();
 module.exports = User;
