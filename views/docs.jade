@@ -1,0 +1,150 @@
+extends layout
+
+block content
+  .row.justify-content-center
+    .col-lg-10
+      .card.mb-4
+        .card-header.bg-primary.text-white
+          h1.card-title.mb-0 API Documentation
+        .card-body
+          p.lead Welcome to the API documentation for this blog application. Below are the available endpoints organized by resource.
+
+      .card.mb-4
+        .card-header.bg-success.text-white
+          h2.card-title.mb-0 Blogs API
+        .card-body
+          .row
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-primary.me-2 GET
+                    | Get All Blogs
+                .card-body
+                  p.card-text <code>/blogs/api</code>
+                  p Returns a list of all blogs.
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-primary.me-2 GET
+                    | Get Blogs with Pagination
+                .card-body
+                  p.card-text <code>/blogs/api/all</code>
+                  p Returns blogs with pagination support.
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-primary.me-2 GET
+                    | Get Single Blog
+                .card-body
+                  p.card-text <code>/blogs/api/:id</code>
+                  p Returns a single blog by ID.
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-success.me-2 POST
+                    | Create Blog
+                .card-body
+                  p.card-text <code>/blogs/api</code>
+                  p Creates a new blog.
+                  .alert.alert-warning.mt-2
+                    strong Requires authentication.
+                    br
+                    | Headers: <code>Authorization: Bearer <token></code>
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-warning.me-2 PUT
+                    | Update Blog
+                .card-body
+                  p.card-text <code>/blogs/api/:id</code>
+                  p Updates an existing blog.
+                  .alert.alert-warning.mt-2
+                    strong Requires authentication.
+                    br
+                    | Headers: <code>Authorization: Bearer <token></code>
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-danger.me-2 DELETE
+                    | Delete Blog
+                .card-body
+                  p.card-text <code>/blogs/api/:id</code>
+                  p Deletes a blog.
+                  .alert.alert-warning.mt-2
+                    strong Requires authentication.
+                    br
+                    | Headers: <code>Authorization: Bearer <token></code>
+
+      .card.mb-4
+        .card-header.bg-info.text-white
+          h2.card-title.mb-0 Users API
+        .card-body
+          .row
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-success.me-2 POST
+                    | Register User
+                .card-body
+                  p.card-text <code>/users/api/register</code>
+                  p Registers a new user.
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-success.me-2 POST
+                    | Login User
+                .card-body
+                  p.card-text <code>/users/api/login</code>
+                  p Logs in a user and returns a JWT token.
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-success.me-2 POST
+                    | Logout User
+                .card-body
+                  p.card-text <code>/users/api/logout</code>
+                  p Logs out a user.
+                  .alert.alert-warning.mt-2
+                    strong Requires authentication.
+                    br
+                    | Headers: <code>Authorization: Bearer <token></code>
+
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-primary.me-2 GET
+                    | Get User Profile
+                .card-body
+                  p.card-text <code>/users/api/profile</code>
+                  p Returns the current user's profile.
+                  .alert.alert-warning.mt-2
+                    strong Requires authentication.
+                    br
+                    | Headers: <code>Authorization: Bearer <token></code>
+
+      .card.mb-4
+        .card-header.bg-secondary.text-white
+          h2.card-title.mb-0 Authentication
+        .card-body
+          p Some endpoints require JWT authentication. Include the token in the Authorization header as <code>Bearer <token></code>.
+          p Obtain a token by logging in via <code>/users/api/login</code>.
+          .alert.alert-info.mt-3
+            strong Note:
+            |  Replace <code><token></code> with your actual JWT token obtained from login.

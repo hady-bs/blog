@@ -44,4 +44,9 @@ router.get(
   }
 );
 
+/* GET API docs page. */
+router.get("/docs", function (req, res, next) {
+  res.render("docs", { title: "API Documentation" });
+});
+
 module.exports = router;
