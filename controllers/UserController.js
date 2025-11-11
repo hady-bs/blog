@@ -7,7 +7,48 @@ const bcrypt = require("bcryptjs");
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
 class UserController {
-  static async addUser(req, res) {
+  // Web: Add user (always redirect)
+  static async addUserWeb(req, res) {
+    try {
+      const value = await User.findOne({
+        where: { userName: req.body.userName },
+      });
+      if (value) {
+        return res.status(400).render("error", {
+          message: "User already exists",
+          error: { status: 400 },
+        });
+      }
+
+      // Hash password before saving
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+      const user = await User.create({
+        userName: req.body.userName,
+        password: hashedPassword,
+      });
+
+      // Generate token for new user
+      const token = jwt.sign(
+        { userId: user.id, userName: user.userName },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
+      // Set cookie and redirect
+      res.cookie("token", token, { httpOnly: true });
+      return res.redirect("/");
+    } catch (error) {
+      console.error("Error creating user:", error);
+      return res.status(400).render("error", {
+        message: "Failed to create user",
+        error: error,
+      });
+    }
+  }
+
+  // API: Add user (always return JSON)
+  static async addUserApi(req, res) {
     try {
       const value = await User.findOne({
         where: { userName: req.body.userName },
@@ -57,7 +98,62 @@ class UserController {
     return res.render("login");
   }
 
-  static async loginUser(req, res) {
+  // Web: Login user (always redirect)
+  static async loginUserWeb(req, res) {
+    try {
+      const { userName, password } = req.body;
+
+      // Check if userName and password are provided
+      if (!userName || !password) {
+        return res.status(400).render("error", {
+          message: "Username and password are required",
+          error: { status: 400 },
+        });
+      }
+
+      // Find user by username
+      const user = await User.findOne({
+        where: { userName: userName },
+      });
+
+      if (user) {
+        // Compare password with hashed password
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (isPasswordValid) {
+          // Generate JWT token
+          const token = jwt.sign(
+            { userId: user.id, userName: user.userName },
+            JWT_SECRET,
+            { expiresIn: "24h" }
+          );
+
+          // Set cookie and redirect
+          res.cookie("token", token, { httpOnly: true });
+          return res.redirect("/");
+        } else {
+          return res.status(401).render("error", {
+            message: "The password is not correct",
+            error: { status: 401 },
+          });
+        }
+      } else {
+        return res.status(401).render("error", {
+          message: "User not found",
+          error: { status: 401 },
+        });
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      return res.status(500).render("error", {
+        message: "Internal server error",
+        error: error,
+      });
+    }
+  }
+
+  // API: Login user (always return JSON)
+  static async loginUserApi(req, res) {
     try {
       const { userName, password } = req.body;
 
@@ -85,22 +181,16 @@ class UserController {
             { expiresIn: "24h" }
           );
 
-          // For API requests, return JSON with token
-          if (req.headers["content-type"] === "application/json") {
-            return res.json({
-              success: true,
-              message: "Login successful",
-              token: token,
-              user: {
-                id: user.id,
-                userName: user.userName,
-              },
-            });
-          }
-
-          // For form submissions, set token in cookie and redirect
-          res.cookie("token", token, { httpOnly: true });
-          return res.redirect("/");
+          // Return JSON with token
+          return res.json({
+            success: true,
+            message: "Login successful",
+            token: token,
+            user: {
+              id: user.id,
+              userName: user.userName,
+            },
+          });
         } else {
           return res.status(401).json({
             message: "The password is not correct",
@@ -174,21 +264,57 @@ class UserController {
     return next();
   }
 
-  // Logout method
-  static logout(req, res) {
-    // Clear cookie
+  // Web: Logout method (always redirect)
+  static logoutWeb(req, res) {
+    // Clear cookie and redirect
     res.clearCookie("token");
+    return res.redirect("/");
+  }
 
+  // API: Logout method (always return JSON)
+  static logoutApi(req, res) {
     // For API requests, return JSON
-    if (req.headers["content-type"] === "application/json") {
+    return res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  }
+
+  // Get user profile API endpoint
+  static async getProfile(req, res) {
+    try {
+      // req.user is set by verifyToken middleware
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: "Access denied. No token provided.",
+        });
+      }
+
+      // Fetch user from database to get latest info
+      const user = await User.findByPk(req.user.userId || req.user.id, {
+        attributes: ["id", "userName", "createdAt", "updatedAt"],
+      });
+
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found",
+        });
+      }
+
       return res.json({
         success: true,
-        message: "Logged out successfully",
+        user: user.toJSON(),
+      });
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Failed to fetch user profile",
+        error: error.message,
       });
     }
-
-    // For web requests, redirect to home
-    return res.redirect("/");
   }
 }
 

@@ -5,6 +5,7 @@ const userController = require("../controllers/UserController");
 const Blog = require("../models/BlogModel");
 const BlogController = require("../controllers/BlogController");
 
+// Web routes - always render views
 // Registration page - show blogs optionally
 router.get(
   "/",
@@ -24,7 +25,7 @@ router.get(
   }
 );
 
-router.post("/", userController.addUser);
+router.post("/", userController.addUserWeb);
 
 // Login page - show blogs optionally
 router.get(
@@ -45,7 +46,7 @@ router.get(
   }
 );
 
-router.post("/login", userController.loginUser);
+router.post("/login", userController.loginUserWeb);
 
 // Profile page
 router.get(
@@ -61,7 +62,24 @@ router.get(
   }
 );
 
-// Logout route
-router.post("/logout", userController.logout);
+// Logout route (web)
+router.post("/logout", userController.logoutWeb);
+
+// API routes - always return JSON
+// Register user (API)
+router.post("/api/register", userController.addUserApi);
+
+// Login user (API)
+router.post("/api/login", userController.loginUserApi);
+
+// Logout user (API)
+router.post("/api/logout", userController.logoutApi);
+
+// API endpoint for getting user profile
+router.get(
+  "/api/profile",
+  userController.verifyToken,
+  userController.getProfile
+);
 
 module.exports = router;
