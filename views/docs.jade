@@ -23,6 +23,10 @@ block content
                 .card-body
                   p.card-text <code>/blogs/api</code>
                   p Returns a list of all blogs.
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code curl -X GET http://localhost:3000/blogs/api
 
             .col-md-6.mb-3
               .card.h-100
@@ -33,6 +37,10 @@ block content
                 .card-body
                   p.card-text <code>/blogs/api/all</code>
                   p Returns blogs with pagination support.
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code curl -X GET "http://localhost:3000/blogs/api/all?page=1&limit=10"
 
             .col-md-6.mb-3
               .card.h-100
@@ -43,6 +51,10 @@ block content
                 .card-body
                   p.card-text <code>/blogs/api/:id</code>
                   p Returns a single blog by ID.
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code curl -X GET http://localhost:3000/blogs/api/1
 
             .col-md-6.mb-3
               .card.h-100
@@ -57,6 +69,14 @@ block content
                     strong Requires authentication.
                     br
                     | Headers: <code>Authorization: Bearer <token></code>
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X POST http://localhost:3000/blogs/api \
+                        -H "Content-Type: application/json" \
+                        -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+                        -d '{"content": "This is a sample blog post content."}'
 
             .col-md-6.mb-3
               .card.h-100
@@ -71,6 +91,14 @@ block content
                     strong Requires authentication.
                     br
                     | Headers: <code>Authorization: Bearer <token></code>
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X PUT http://localhost:3000/blogs/api/1 \
+                        -H "Content-Type: application/json" \
+                        -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+                        -d '{"content": "Updated blog post content."}'
 
             .col-md-6.mb-3
               .card.h-100
@@ -85,6 +113,12 @@ block content
                     strong Requires authentication.
                     br
                     | Headers: <code>Authorization: Bearer <token></code>
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X DELETE http://localhost:3000/blogs/api/1 \
+                        -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
       .card.mb-4
         .card-header.bg-info.text-white
@@ -100,6 +134,13 @@ block content
                 .card-body
                   p.card-text <code>/users/api/register</code>
                   p Registers a new user.
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X POST http://localhost:3000/users/api/register \
+                        -H "Content-Type: application/json" \
+                        -d '{"userName": "johndoe", "password": "password123"}'
 
             .col-md-6.mb-3
               .card.h-100
@@ -110,6 +151,13 @@ block content
                 .card-body
                   p.card-text <code>/users/api/login</code>
                   p Logs in a user and returns a JWT token.
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X POST http://localhost:3000/users/api/login \
+                        -H "Content-Type: application/json" \
+                        -d '{"userName": "johndoe", "password": "password123"}'
 
             .col-md-6.mb-3
               .card.h-100
@@ -124,6 +172,12 @@ block content
                     strong Requires authentication.
                     br
                     | Headers: <code>Authorization: Bearer <token></code>
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X POST http://localhost:3000/users/api/logout \
+                        -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
             .col-md-6.mb-3
               .card.h-100
@@ -138,6 +192,12 @@ block content
                     strong Requires authentication.
                     br
                     | Headers: <code>Authorization: Bearer <token></code>
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X GET http://localhost:3000/users/api/profile \
+                        -H "Authorization: Bearer YOUR_JWT_TOKEN"
 
       .card.mb-4
         .card-header.bg-secondary.text-white

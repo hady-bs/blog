@@ -61,8 +61,39 @@ class BlogController {
   // API: List all blogs (always return JSON)
   static async listBlogsApi(req, res) {
     try {
-      const blogs = await BlogController.fetchBlogsForView();
-      return res.json({ success: true, blogs });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const offset = (page - 1) * limit;
+
+      const { count, rows } = await Blog.findAndCountAll({
+        include: [
+          {
+            model: User,
+            as: "User",
+            attributes: ["id", "userName"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+        limit: limit,
+        offset: offset,
+      });
+
+      const totalPages = Math.ceil(count / limit);
+      const blogs = rows.map((blog) => blog.toJSON());
+
+      return res.json({
+        success: true,
+        blogs,
+        pagination: {
+          currentPage: page,
+          totalPages: totalPages,
+          totalBlogs: count,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+          nextPage: page + 1,
+          prevPage: page - 1,
+        },
+      });
     } catch (error) {
       console.error("❌ Error fetching blogs:", error.message);
       return res.status(500).json({
