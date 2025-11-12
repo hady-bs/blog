@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const User = require("../models/UsersModel");
+const Blog = require("../models/BlogModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
