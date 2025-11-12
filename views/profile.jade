@@ -31,6 +31,37 @@ block content
                   br
                   span.fw-semibold= user.userId
 
+            .mt-5
+              h5.mb-4
+                span.material-icons.me-2 article
+                | Your Blogs
+              if blogs && blogs.length > 0
+                .row.g-3
+                  each blog in blogs
+                    .col-md-6.col-lg-4
+                      .card.h-100.blog-card
+                        .card-body
+                          p.card-text= blog.content.substring(0, 100) + (blog.content.length > 100 ? '...' : '')
+                          .d-flex.justify-content-between.align-items-center.mt-3
+                            small.text-muted= new Date(blog.createdAt).toLocaleDateString()
+                            .btn-group
+                              a.btn.btn-sm.btn-outline-primary(href=`/blogs/api/${blog.id}`)
+                                span.material-icons view_list
+                              a.btn.btn-sm.btn-outline-warning(href=`/blogs/api/${blog.id}`)
+                                span.material-icons edit
+                              a.btn.btn-sm.btn-outline-danger(href=`/blogs/api/${blog.id}`)
+                                span.material-icons delete
+                .text-center.mt-4
+                  a.btn.btn-outline-secondary(href='/blogs')
+                    span.material-icons.me-2 list
+                    | View All Blogs
+              else
+                .text-center.text-muted.mt-4
+                  p.mb-3 No blogs yet.
+                  a.btn.btn-success(href='/blogs/new')
+                    span.material-icons.me-2 add_circle
+                    | Create Your First Blog
+
             .text-center.mt-5
               .d-flex.justify-content-center.gap-3
                 a.btn.btn-success.btn-lg(href='/blogs/new')
@@ -64,6 +95,26 @@ block content
     .info-card:hover {
       transform: translateY(-2px);
       transition: transform 0.3s ease;
+    }
+    .blog-card {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .blog-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .blog-card .card-body {
+      padding: 1.25rem;
+    }
+    .blog-card .card-text {
+      color: #495057;
+      line-height: 1.5;
+    }
+    .blog-card .btn-group .btn {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.75rem;
     }
 
     /* Responsive styles for profile page */

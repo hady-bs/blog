@@ -187,7 +187,7 @@ block content
                     | Get User Profile
                 .card-body
                   p.card-text <code>/users/api/profile</code>
-                  p Returns the current user's profile.
+                  p Returns the current user's profile and their blogs.
                   .alert.alert-warning.mt-2
                     strong Requires authentication.
                     br
@@ -208,3 +208,28 @@ block content
           .alert.alert-info.mt-3
             strong Note:
             |  Replace <code><token></code> with your actual JWT token obtained from login.
+
+      .card.mb-4
+        .card-header.bg-info.text-white
+          h2.card-title.mb-0 User Blogs API
+        .card-body
+          .row
+            .col-md-6.mb-3
+              .card.h-100
+                .card-header.bg-light
+                  h5.card-title.mb-0
+                    span.badge.bg-primary.me-2 GET
+                    | Get User's Blogs
+                .card-body
+                  p.card-text <code>/users/api/blogs</code>
+                  p Returns blogs created by the authenticated user.
+                  .alert.alert-warning.mt-2
+                    strong Requires authentication.
+                    br
+                    | Headers: <code>Authorization: Bearer <token></code>
+                  .mt-2
+                    strong Example Request:
+                    pre.bg-light.p-2.rounded
+                      code.
+                        curl -X GET http://localhost:3000/users/api/blogs \
+                        -H "Authorization: Bearer YOUR_JWT_TOKEN"

@@ -303,9 +303,23 @@ class UserController {
         });
       }
 
+      // Fetch user's blogs
+      const userBlogs = await Blog.findAll({
+        where: { userid: req.user.userId || req.user.id },
+        include: [
+          {
+            model: User,
+            as: "User",
+            attributes: ["id", "userName"],
+          },
+        ],
+        order: [["createdAt", "DESC"]],
+      });
+
       return res.json({
         success: true,
         user: user.toJSON(),
+        blogs: userBlogs.map((blog) => blog.toJSON()),
       });
     } catch (error) {
       console.error("Error fetching user profile:", error);
