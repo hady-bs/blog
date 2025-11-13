@@ -16,6 +16,10 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  refreshToken: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
 });
 // Associate Blog and User using `userid` as the foreign key on Blog
 User.hasMany(BlogModel, { foreignKey: "userid", sourceKey: "id" });

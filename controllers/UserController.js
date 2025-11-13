@@ -68,12 +68,30 @@ class UserController {
         password: hashedPassword,
       });
 
-      // Generate token for new user
+      // Generate access token
       const token = jwt.sign(
         { userId: user.id, userName: user.userName },
         JWT_SECRET,
         { expiresIn: "24h" }
       );
+
+      // Generate refresh token
+      const refreshToken = jwt.sign(
+        { userId: user.id, userName: user.userName },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      // Store refresh token in database
+      await user.update({ refreshToken });
+
+      // Set refresh token in httpOnly cookie
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
 
       return res.status(201).json({
         success: true,
@@ -175,12 +193,30 @@ class UserController {
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (isPasswordValid) {
-          // Generate JWT token
+          // Generate access token
           const token = jwt.sign(
             { userId: user.id, userName: user.userName },
             JWT_SECRET,
             { expiresIn: "24h" }
           );
+
+          // Generate refresh token
+          const refreshToken = jwt.sign(
+            { userId: user.id, userName: user.userName },
+            JWT_SECRET,
+            { expiresIn: "7d" }
+          );
+
+          // Store refresh token in database
+          await user.update({ refreshToken });
+
+          // Set refresh token in httpOnly cookie
+          res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+          });
 
           // Return JSON with token
           return res.json({
@@ -273,12 +309,108 @@ class UserController {
   }
 
   // API: Logout method (always return JSON)
-  static logoutApi(req, res) {
-    // For API requests, return JSON
-    return res.json({
-      success: true,
-      message: "Logged out successfully",
-    });
+  static async logoutApi(req, res) {
+    try {
+      // Clear refresh token from database if user is authenticated
+      if (req.user) {
+        const user = await User.findByPk(req.user.userId || req.user.id);
+        if (user) {
+          await user.update({ refreshToken: null });
+        }
+      }
+
+      // Clear refresh token cookie
+      res.clearCookie("refreshToken");
+
+      // For API requests, return JSON
+      return res.json({
+        success: true,
+        message: "Logged out successfully",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Logout failed",
+        error: error.message,
+      });
+    }
+  }
+
+  // API: Refresh token method
+  static async refreshTokenApi(req, res) {
+    try {
+      const refreshToken = req.cookies?.refreshToken;
+
+      if (!refreshToken) {
+        return res.status(401).json({
+          success: false,
+          message: "Refresh token not provided",
+        });
+      }
+
+      // Verify refresh token
+      let decoded;
+      try {
+        decoded = jwt.verify(refreshToken, JWT_SECRET);
+      } catch (error) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid refresh token",
+        });
+      }
+
+      // Find user and check if refresh token matches
+      const user = await User.findByPk(decoded.userId || decoded.id);
+      if (!user || user.refreshToken !== refreshToken) {
+        return res.status(401).json({
+          success: false,
+          message: "Invalid refresh token",
+        });
+      }
+
+      // Generate new access token
+      const newAccessToken = jwt.sign(
+        { userId: user.id, userName: user.userName },
+        JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+
+      // Optionally rotate refresh token for security
+      const newRefreshToken = jwt.sign(
+        { userId: user.id, userName: user.userName },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      // Update refresh token in database
+      await user.update({ refreshToken: newRefreshToken });
+
+      // Set new refresh token in cookie
+      res.cookie("refreshToken", newRefreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      });
+
+      return res.json({
+        success: true,
+        message: "Token refreshed successfully",
+        token: newAccessToken,
+        user: {
+          id: user.id,
+          userName: user.userName,
+        },
+      });
+    } catch (error) {
+      console.error("Token refresh error:", error);
+      return res.status(500).json({
+        success: false,
+        message: "Token refresh failed",
+        error: error.message,
+      });
+    }
   }
 
   // Get user profile API endpoint

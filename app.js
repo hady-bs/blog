@@ -21,6 +21,7 @@ const Blog = require("./models/BlogModel");
     console.log("Running migrations...");
     await require("./scripts/migrate_blogs_add_columns")();
     await require("./scripts/migrate_blogs_timestamps")();
+    await require("./scripts/migrate_users_add_refresh_token")();
     console.log("All migrations completed successfully");
   } catch (error) {
     console.error("Migration failed:", error.message);

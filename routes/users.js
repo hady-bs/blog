@@ -87,6 +87,9 @@ router.post("/api/login", userController.loginUserApi);
 // Logout user (API)
 router.post("/api/logout", userController.logoutApi);
 
+// Refresh token (API)
+router.post("/api/refresh", userController.refreshTokenApi);
+
 // API endpoint for getting user profile
 router.get(
   "/api/profile",
